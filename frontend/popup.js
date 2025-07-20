@@ -14,6 +14,11 @@ document.getElementById("next").onclick = () => {
 document.getElementById("getAnswer").onclick = () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { type: "GET_TITLE" }, (res) => {
+      if (!res?.title) {
+        alert("Could not fetch title. Are you on a LeetCode page?");
+        return;
+      }
+
       fetch("https://ai-hint-extension.onrender.com/get-answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,9 +42,15 @@ document.getElementById("getAnswer").onclick = () => {
   });
 };
 
+
 // Automatically fetch hints on popup load
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   chrome.tabs.sendMessage(tabs[0].id, { type: "GET_TITLE" }, (res) => {
+    if (!res?.title) {
+      alert("Could not fetch title. Are you on a LeetCode page?");
+      return;
+    }
+
     fetch("https://ai-hint-extension.onrender.com/get-hints", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,3 +79,4 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       });
   });
 });
+
