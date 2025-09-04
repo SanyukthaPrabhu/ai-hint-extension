@@ -1,91 +1,58 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const { Configuration, OpenAIApi } = require("openai");
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Configure OpenAI
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
-// Root route (optional)
-app.get("/", (req, res) => {
-  res.json({ message: "AI Hint Extension Backend is running" });
-});
-
-// Get Hints Endpoint
 app.post("/get-hints", async (req, res) => {
   const { title } = req.body;
-
-  if (!title) {
-    return res.status(400).json({ error: "Title is required." });
-  }
+  const prompt = `Give 3 step-by-step hints for solving the coding problem titled "${title}". Do not reveal the answer.`;
 
   try {
-    const response = await openai.createChatCompletion({
+    const response = await axios.post("https://api.openai.com/v1/chat/completions", {
       model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful assistant who gives step-by-step hints for solving programming problems.",
-        },
-        {
-          role: "user",
-          content: `Give me 3 hints to solve the LeetCode problem titled: "${title}". Don't give the answer.`,
-        },
-      ],
+      messages: [{ role: "user", content: prompt }]
+    }, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      }
     });
 
-    const text = response.data.choices[0].message.content.trim();
-    const hints = text.split(/\n+/).map(h => h.trim()).filter(Boolean);
-
+    const message = response.data.choices[0].message.content;
+    const hints = message.split("\n").filter(line => line.trim());
     res.json({ hints });
-  } catch (error) {
-    console.error("OpenAI Hint Error:", error.message);
-    res.status(500).json({ error: "Failed to get hints from AI." });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("API Error");
   }
 });
 
-// Get Answer Endpoint
 app.post("/get-answer", async (req, res) => {
   const { title } = req.body;
-
-  if (!title) {
-    return res.status(400).json({ error: "Title is required." });
-  }
+  const prompt = `Give a detailed explanation (but not direct code) for solving the problem titled "${title}".`;
 
   try {
-    const response = await openai.createChatCompletion({
+    const response = await axios.post("https://api.openai.com/v1/chat/completions", {
       model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a coding assistant that gives complete explanations and code for LeetCode problems.",
-        },
-        {
-          role: "user",
-          content: `Give the full solution with explanation and code for the LeetCode problem titled: "${title}".`,
-        },
-      ],
+      messages: [{ role: "user", content: prompt }]
+    }, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      }
     });
 
-    const answer = response.data.choices[0].message.content.trim();
-    res.json({ answer });
-  } catch (error) {
-    console.error("OpenAI Answer Error:", error.message);
-    res.status(500).json({ error: "Failed to get answer from AI." });
+    const message = response.data.choices[0].message.content;
+    res.json({ answer: message });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("API Error");
   }
 });
 
-// Start server
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Backend running on port ${process.env.PORT || 3000}`);
-});
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
