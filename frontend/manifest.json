@@ -2,15 +2,17 @@
   "manifest_version": 3,
   "name": "Smart Hint Extension",
   "version": "1.0",
-  "description": "Get AI hints for coding problems.",
   "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+  "*://*.leetcode.com/*",
+  "http://localhost:3000/*"
+],
   "action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://*.leetcode.com/*"],
       "js": ["content.js"]
     }
   ]
