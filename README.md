@@ -1,8 +1,18 @@
-Smart Hint is a Chrome Extension that integrates with competitive programming platforms like LeetCode and
-Codeforces to deliver step-by-step AI-generated hints and conceptual explanations without exposing the
-direct solution. It leverages the OpenAI API to provide dynamic, context-aware support based on the
-problem currently being solved. The extension includes a lightweight frontend built with HTML, CSS, and
-JavaScript, and a Node.js backend hosted on Render. It features automatic problem detection using DOM
-parsing, an intuitive popup interface, and an option for on-demand explanations. Designed to support both
-beginner and advanced programmers, the tool boosts independent problem-solving while maintaining
-learning integrity.
+# Smart Hint Chrome Extension 🚀
+An AI-powered assistant for LeetCode that provides step-by-step hints and logic explanations without spoiling the solution.
+
+## 🛠️ Tech Stack
+- **Frontend:** Chrome Extension API (Manifest V3), JavaScript
+- **Backend:** Node.js, Express.js
+- **AI:** Google Gemini 1.5 Flash
+
+## 🚀 How to Run
+1. **Backend:**
+   - Clone the repo.
+   - Run `npm install`.
+   - Create a `.env` file with `GEMINI_API_KEY=your_key`.
+   - Run `node server.js`.
+2. **Extension:**
+   - Go to `chrome://extensions`.
+   - Enable "Developer mode".
+   - Click "Load unpacked" and select the project folder.
